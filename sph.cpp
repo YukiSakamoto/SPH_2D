@@ -90,7 +90,10 @@ void ComputeForces(void)
 
 void Integrate(void)
 {
-    for(auto &p : particles) {
+    //for(auto &p : particles) {
+    #pragma omp parallel for
+    for(size_t i = 0; i < particles.size(); i++) {
+        Particle &p = particles[i];
         p.v += DT * p.f / p.rho;
         p.r += DT * p.v;
         if (p.r(0) - EPS < 0.f){
