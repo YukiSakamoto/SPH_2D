@@ -117,6 +117,7 @@ void InitSPH(void)
     const size_t num_particles_limit = 3000;
     for(float y = EPS; y < VIEW_HEIGHT - EPS * 2.0; y += H) {
         for(float x = VIEW_WIDTH/ 4; x <= VIEW_WIDTH / 2; x += H) {
+        //for(float x = VIEW_WIDTH/ 4; x <= VIEW_WIDTH *3 / 4; x += H) {
             if (particles.size() < num_particles_limit) {
                 //float jitter = static_cast<float>(arc4random())/static_cast<float>(RAND_MAX);
                 float jitter = static_cast<float>(rand())/static_cast<float>(RAND_MAX);
@@ -183,14 +184,31 @@ void update()
 
 // Emscripten 用のメインループ
 void main_loop_func() { 
+    static double last_time = glfwGetTime();
+    static size_t frame_count = 0;
+    static size_t total_frame_count = 0;
+
     update();
     render(); 
+
+    frame_count++;
+    total_frame_count++;
+    
+    double current_time = glfwGetTime();
+    double delta_t = current_time - last_time;
+    if (delta_t >= 1.0) {
+        std::printf("FPS: %f\tTotal: %zu\n", static_cast<double>(frame_count) / delta_t, total_frame_count);
+        //std::cout << "FPS << " << static_cast<double>(frame_count) / delta_t << "\t" << "Total: " << total_frame_count << std::endl;
+        last_time = current_time;
+        frame_count = 0;
+    }
+    std::fflush(stdout);
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS) {
-        if (key == GLFW_KEY_Q) {
+        if (key == GLFW_KEY_Q || key == GLFW_KEY_ESCAPE) {
             std::cout << "QUIT!" << std::endl;
 #ifdef __EMSCRIPTEN__
             emscripten_cancel_main_loop();
@@ -221,7 +239,9 @@ int main() {
     }
 
 #ifdef _OPENMP
-    std::printf("Run on %d threads\n", omp_get_num_threads());
+    std::printf("OpenMP Enabled. Run on %d threads\n", omp_get_num_threads());
+#else
+    std::printf("OpenMP Disabled.\n");
 #endif
 
     // macOS の場合は OpenGL 3.2 Core Profile を指定

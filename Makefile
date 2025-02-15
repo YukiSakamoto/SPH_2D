@@ -1,5 +1,6 @@
 
 CC=g++
+OMP_FLAG=-Xpreprocessor -fopenmp -lomp 
 point:
 	$(CC) -framework OpenGL -lglfw -Wno-deprecated point.cpp -o point
 em:
@@ -10,4 +11,6 @@ sph_emscripten: sph.cpp
 sph: sph.cpp
 	$(CC) sph.cpp -o sph -lglfw -framework OpenGL -std=c++17 -Wno-deprecated -O3
 sph_omp: sph.cpp
-	$(CC) sph.cpp -o sph_omp -lglfw -framework OpenGL -std=c++17 -Wno-deprecated -O3 -Xpreprocessor -fopenmp -lomp $(OMP_CPPFLAGS) $(OMP_LDFLAGS)
+	$(CC) sph.cpp -o sph_omp -lglfw -framework OpenGL -std=c++17 -Wno-deprecated -O3 $(OMP_FLAG) $(OMP_CPPFLAGS) $(OMP_LDFLAGS)
+hoge: hoge.cpp
+	$(CC) hoge.cpp -o hoge -lglfw -framework OpenGL -std=c++17 -Wno-deprecated -O3 $(OMP_FLAG) $(OMP_CPPFLAGS) $(OMP_LDFLAGS)
